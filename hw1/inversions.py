@@ -52,11 +52,13 @@ def sort_and_count_split_inversions(firstHalf, secondHalf):
 
 if __name__ == '__main__':
     
-    target = r"https://d18ky98rnyall9.cloudfront.net/_bcb5c6658381416d19b01bfc1d3993b5_IntegerArray.txt?Expires=1471737600&Signature=APG2s6NbRn-Aew34U2qk8ScR84si8W8AG7UAuBwMm2dM1TaDKjJUyUY4foETthUc1vra8YqFZrjcAqo2e4xzFbZBQeYUkSPkLSnUnYlTlFpEp54tcMahM~lbpKDZF7SJhpOCLChul2lOUr9olCPLOqXVMlNyYyGZjp3cAST07Kc_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A"
-    data = urllib2.urlopen(target)
+    # download your text file to some location
+    location = r"put your location here"
 
-    inputArray = []
-    for line in data:
-        inputArray.append(line)
+    with open(location) as f:
 
+        inputArray = []
+        for line in f.readlines():
+            inputArray.append(line.split('\\')[0]) # remember to escape the \ in '\n'
+        
     print(get_num_inversions(inputArray))
