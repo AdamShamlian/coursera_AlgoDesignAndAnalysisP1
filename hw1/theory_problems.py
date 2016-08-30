@@ -1,7 +1,4 @@
-import numpy as np
-
-#question 1
-class SecondLargestElement(object):
+class SecondLargestElementFinder(object):
     
     """ An implementation of the algorithm to Optional Theory Problems 1-1 for 
     Coursera's Stanford's Design and Analysis of Algorithms, Part 1. 
@@ -17,11 +14,11 @@ class SecondLargestElement(object):
         assert np.log(len(self.array)) % 1 == 0, 'The array length must be a power of two.'
         assert len(a) == len(set(a)), 'The array must contain distinct integers.'
 
-        self._storage = {str(x): [] for x in self.array} # I don't like to use "number" types as dict keys
+        self._storage = {str(x): [] for x in self.array} # I prefer strings over numerals as dict keys
 
 
-    def _find_binary_max(self, a):
-        """ This runs in n-1 time. """
+    def _find_max_by_twos(self, a):
+        """ Embedded in _prep_second_largest, this runs in n-1 time. """
         
         tmp = []
 
@@ -32,7 +29,7 @@ class SecondLargestElement(object):
                 binMax = a[i]
 
             else:
-                self._storage[str(a[i+1])].append(a[i+1])
+                self._storage[str(a[i+1])].append(a[i])
                 binMax = a[i+1]
 
             tmp.append(binMax)
@@ -41,7 +38,8 @@ class SecondLargestElement(object):
 
 
     def _prep_second_largest(self, a):
-        """ The divide and conquer of the broader algorithm. This runs in constant time. """
+        """ The divide and conquer of the broader algorithm. The operations in this function are 
+        constant, but the embedded function runs in n-1 time. """
         
         if len(a) == 2:
 
@@ -53,9 +51,9 @@ class SecondLargestElement(object):
                 self._storage[str(a[1])].append(a[0])
                 arrayMax = str(a[1])
 
-            return arrayMax
+            return arrayMax # returned as a string to match dict key
 
-        return _prep_second_largest(_find_binary_max(a))
+        return _prep_second_largest(_find_max_by_twos(a))
 
 
     def find_second_largest(self, a):
@@ -75,60 +73,60 @@ class SecondLargestElement(object):
         return arraySecondMax
 
 
-# question 2
-def unimodal_max(array):
+
+
+
+def find_unimodal_max(inputArray):
     """ Determine the maximal element in a unimodal array. This runs in O(log n) time,
     as it's essentially a binary search."""
     
-    halfIdx = int(len(array) / 2 + 0.5) # guarantees we optimally split the array (integer truncation)
+    halfIdx = int(len(inputArray) / 2 + 0.5) # guarantees we optimally split the array (integer truncation)
 
-    if len(array) == 2: # more explicit than the "quicker" check that halfIdx == 1
-        return array[1] if array[1] > array[0] else array[0]
+    if len(inputArray) == 2: # more explicit than the "quicker" check that halfIdx == 1
+        return inputArray[1] if inputArray[1] > inputArray[0] else inputArray[0]
 
-    # recall, n DISTINCT elements
-    if array[halfIdx-1] < array[halfIdx]: 
+    # recall, n DISTINCT elements, so only need to worry about < or >
+    if inputArray[halfIdx-1] < inputArray[halfIdx]: 
         # max must be in array[halfIdx:] because of the montone nature in the two subarrays, a_inc and b_dec
-        return unimodal_max(array[halfIdx:])
+        return unimodal_max(inputArray[halfIdx:])
     
     else:
         # same but in opposite direction
-        return unimodal_max(array[:halfIdx])
+        return unimodal_max(inputArray[:halfIdx])
 
 
-# question 3
-def linear_index_equals_element_check(array):
+
+def check_linearly_index_equals_element(inputAarray):
     """ Here's the O(n) case, which is more or less trivial. Can we do better? 
     Let's try to take advantage of the sortedness of the array. """
     
-    arrayLength = len(array)
+    arrayLength = len(inputAarray)
 
     for i in range(arrayLength):
 
-        if array[i] == i or array[-i] == -i:
+        if inputAarray[i] == i or inputAarray[-i] == -i:
             return True
     return False 
 
-def take_two(array, i):
+
+
+def check_sublinearly_index_equals_element(inputAarray, i):
     """ While technically O(n) in the worst case, this should perform better than
     the naive search. 
 
     NOTE: This is SIMILAR to http://stackoverflow.com/questions/4172580/interview-question-search-in-sorted-array-x-for-index-i-such-that-xi-i
     provided solution. 
-    
-    NOTE (I think?): Also, my interpretation of using negative indices may make this impossible 
-    to execute in guaranteed O(log n). In the case of purely positive index calls, this is the same
+
+    NOTE: Also, my interpretation of using negative indices may make this impossible 
+    to execute in truly O(log n). In the case of purely positive index calls, this is the same
     solution. """
     
-    if array[i] == i or array[-i] == -i:
+    if inputAarray[i] == i or inputAarray[-i] == -i:
         return True
-    if i == -1 or i >= len(array)-1: 
+    if i == -1 or i >= len(inputAarray)-1: 
         return False
 
-    if array[i] >= 0:
-        return take_two(array, array[i] - i)
+    if inputAarray[i] >= 0:
+        return take_two(inputAarray, inputAarray[i] - i)
     else:
-        return take_two(array, array[i] - len(array))
-
-
-if __name__ == '__main__':
-    pass
+        return take_two(inputArray, inputAarray[i] - len(inputAarray))
