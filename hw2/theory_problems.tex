@@ -1,0 +1,72 @@
+\documentclass[12pt]{article}
+ \usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+ 
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+%If you want to title your bold things something different just make another thing exactly like this but replace "problem" with the name of the thing you want, like theorem or lemma or whatever
+ 
+\begin{document}
+ 
+%\renewcommand{\qedsymbol}{\filledbox}
+%Good resources for looking up how to do stuff:
+%Binary operators: http://www.access2science.com/latex/Binary.html
+%General help: http://en.wikibooks.org/wiki/LaTeX/Mathematics
+%Or just google stuff
+ 
+\title{Theory Problems 2}
+\author{Adam Shamlian}
+\maketitle
+ 
+\begin{problem}{1}
+Give the best upper bound that you can on the solution to the following recurrence: $T(1) = 1$ and $T(n) \leq T(\left\lfloor{\sqrt{x}}\right\lfloor) + 1$ for $n > 1$.
+\end{problem}
+
+Initially, I set out to bound the right side of the recurrence with a term like $T(\left\lfloor{x/2}\right\rfloor) + 1$, which is relatively straightforward. However, intuitively comparing "graphs" of the asymptotic behavior, I was a little confused. After comparing the final result (without checking the methodology), I realized that some kind of change of variables was needed to more adequately bound the behavior of $T(n)$. 
+
+\begin{proof}
+Firstly, we know by definition that $\sqrt{n} \geq \left\lfloor\sqrt{n}\right\rfloor, \forall n \geq 1$. With this, we can proceed with the change of variables, which can be realized by observing $k$ iterations of the recurrence:
+\begin{align*}
+&k = 1:& &T(n) \leq T(n^{1/2}) + 1 \\
+&k = 2:& &T(n) \leq T(n^{1/4}) + 1 \\
+&...   & &... \\
+&k = m:& &T(n) \leq T(n^{1/2^m}) + 1
+\end{align*}
+From here it's easiest to see the change of variables by looking at this recursion in the other direction. That is, at the beginning of the algorithm we have $c^{2^k}$ array elements (WLOG, let $c = 2$). 
+\begin{equation}
+2^{2^k} = n \implies k = \log{\log{n}}
+\end{equation}
+We can see that the constant operation in each step of the algorithm does not change this result.
+\end{proof}
+
+
+\begin{problem}{2}
+You are given an n by n grid of distinct numbers. A number is a local minimum if it is smaller than all of its neighbors. (A neighbor of a number is one immediately above, below, to the left, or the right. Most numbers have four neighbors; numbers on the side have three; the four corners have two.) Use the divide-and-conquer algorithm design paradigm to compute a local minimum with only O(n) comparisons between pairs of numbers.
+\end{problem}
+
+Almost immediately, this one screams some kind of ``gradient descent''-like approach, treating the values of the matrix as the landscape through which one descends. The tricky part about this is how to get $O(n)$ complexity out of it. The only intuition I had for this was the approaches to matrix multiplication that were covered in previous weeks, that is, find a way to break the matrix into four ``corner'' matrices.
+
+
+\begin{proof}
+Consider the $n x n$ matrix A, which we will break up into four child, square matrices. If n is odd, take the $\left\lceil{n/2}\right\rceil^{th}$ row and column, and consider the remaining quadrants the child matrices. If n is even, do the same, instead taking the $n/2^{th}$ row and column as ``separators''. 
+
+Recall that we must find \textit{a} local minimum (as opposed to all local minima). Thus, we can descend into one of these child matrices and find a minimum there. We make this choice by looking at the ``separating'' row and column, ${i^*}$ and ${j^*}$, and taking the minimal element, $m = \min\limits_{i=i^* or j=j*}{a_{ij}}$. We know this will take $2n - 1$ operations in the worst case. 
+
+Take the indices of this element m, $i'$ and $j'$. There are now several cases with which we can proceed:
+
+\begin{enumerate}
+ \item If $i' = n/2 or \left\lceil{n/2}\right\rceil$ (for n even or odd, respectively), and $j' \neq n/2 or \left\lceil{n/2}\right\rceil$ (...), take the indices of the element $\min{m_{i'j'+1}, m_{i'j'-1}, m}$. 
+ \item Consider the vice versa, looking at $\min{m_{i'-1j'}, m_{i'-1j'}, m}$.
+ \item If $i' = j' = n/2 or \left\lceil{n/2}\right\rceil$ (for n even or odd, respectively), these indices.
+\end{enumerate}
+If $i' = j' = ...$, we're done. Otherwise descend into the child matrix containing the new minimal element. And recurse until the child matrix is of size $1 x 1$. Furthermore, it is clear that we only descend into one such child matrix at each level of the recursion tree,
+thus the recurrence relation can be expressed as:
+\begin{equation}
+$T(n) \leq T(n/2) + 2n + 1$
+\end{equation}
+Referring to the Master Theorem, we see that $a = 1, b = 2, and c = 1$, with $f(n) \element O(n)$. Notice that $\log_ba = 0 < 1$, and taking $1/2 < k < 1$, we verify the conditions of case three. By the theorem statement, $T(n) \element\ O(2n - 1) \element O(n)$.
+\end{proof}
+\end{document}
